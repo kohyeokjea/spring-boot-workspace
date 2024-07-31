@@ -1,5 +1,6 @@
 package com.example.ex07_form;
 
+//커맨드 객체
 public class Member {
     private String id;
     private String name;
