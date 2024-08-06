@@ -8,9 +8,18 @@
         </encoder>
     </appender>
 
+    <!-- <logger name="com.example.ex19_mybatis_sql_log" level="debug" /> -->
     <logger name="com.example.ex19_mybatis_sql_log" level="info" />
 
-    <root level="info">
+    <logger name="jdbc" level="OFF" />
+    <logger name="jdbc.sqlonly" level="OFF" />
+    <logger name="jdbc.sqltiming" level="DEBUG" />
+    <logger name="jdbc.resultset" level="OFF" />
+    <logger name="jdbc.resultsettable" level="DEBUG" />
+    <logger name="jdbc.connection" level="OFF" />
+
+    <!-- <root level="info"> -->
+    <root level="off">
         <appender-ref ref="console" />
     </root>
 </configuration>
