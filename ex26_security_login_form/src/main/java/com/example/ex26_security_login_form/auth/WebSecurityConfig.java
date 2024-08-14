@@ -1,4 +1,4 @@
-package com.example.ex25_security.auth;
+package com.example.ex26_security_login_form.auth;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,7 +21,11 @@ public class WebSecurityConfig {
                 .requestMatchers("/member/**").hasAnyRole("USER", "ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated())
-                .formLogin(formLogin -> formLogin.permitAll())
+                .formLogin(
+                        formLogin -> formLogin.permitAll().loginPage("/login-form")
+                                .defaultSuccessUrl("/member/welcome", true)
+                                .failureUrl("/login-error")
+                                .permitAll())
                 .logout(logout -> logout.permitAll());
 
         return http.build();
@@ -30,8 +34,9 @@ public class WebSecurityConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         UserDetails user = User.withUsername("user").password(passwordEncoder().encode("1234")).roles("USER").build();
-       
-        UserDetails admin = User.withUsername("admin").password(passwordEncoder().encode("1234")).roles("ADMIN").build();
+
+        UserDetails admin = User.withUsername("admin").password(passwordEncoder().encode("1234")).roles("ADMIN")
+                .build();
         return new InMemoryUserDetailsManager(user, admin);
     }
 
