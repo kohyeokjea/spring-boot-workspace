@@ -1,14 +1,14 @@
-package com.example.ex27_security_status_check.auth;
+package com.example.ex28_security_db.auth;
+
+import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
@@ -40,17 +40,36 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    @Autowired
+    private DataSource dataSource;
+
     @Bean
     public UserDetailsService userDetailsService() {
-        UserDetails user = User.withUsername("user").password(passwordEncoder().encode("1234")).roles("USER").build();
+        JdbcUserDetailsManager users = new JdbcUserDetailsManager(dataSource);
+        users.setUsersByUsernameQuery("select name, password, enabled from user_list where name = ?");
+        users.setAuthoritiesByUsernameQuery("select name, authority from user_list where name = ?");
 
-        UserDetails admin = User.withUsername("admin").password(passwordEncoder().encode("1234")).roles("ADMIN")
-                .build();
-        return new InMemoryUserDetailsManager(user, admin);
+        return users;
     }
+
+    // ! 평문 비밀번호 인코딩을 위한 커스텀 인코더
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    //     return new PasswordEncoder() {
+    //         @Override
+    //         public String encode(CharSequence rawPassword) {
+    //             return rawPassword.toString();
+    //         }
+
+    //         @Override
+    //         public boolean matches(CharSequence rawPassword, String encodePassword) {
+    //             return rawPassword.toString().equals(encodePassword);
+    //         }
+    //     };
+    // }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    return new BCryptPasswordEncoder();
     }
 }
