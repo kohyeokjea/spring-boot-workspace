@@ -1,4 +1,4 @@
-package com.example.ex30_jpa_qnaboard_rest_api.question;
+package com.example.ex31_jpa_qnaboard_rest_api_security.question;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,7 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import com.example.ex30_jpa_qnaboard_rest_api.DataNotFoundException;
+import com.example.ex31_jpa_qnaboard_rest_api_security.DataNotFoundException;
+import com.example.ex31_jpa_qnaboard_rest_api_security.user.UserEntity;
 
 import lombok.RequiredArgsConstructor;
 
@@ -22,11 +23,10 @@ public class QuestionService {
     private final QuestionRepository questionRepository;
 
     // public List<Question> getList() {
-    //     return this.questionRepository.findAll();
+    // return this.questionRepository.findAll();
     // }
 
-    
-    public Question getQuestion(Integer id) {  
+    public Question getQuestion(Integer id) {
         Optional<Question> question = this.questionRepository.findById(id);
         if (question.isPresent()) {
             return question.get();
@@ -35,11 +35,12 @@ public class QuestionService {
         }
     }
 
-    public void create(String subject, String content) {
+    public void create(String subject, String content, UserEntity user) {
         Question q = new Question();
         q.setSubject(subject);
         q.setContent(content);
         q.setCreateDate(LocalDateTime.now());
+        q.setAuthor(user);
         this.questionRepository.save(q);
     }
 
@@ -50,5 +51,18 @@ public class QuestionService {
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 10, Sort.by(sorts));
         return this.questionRepository.findAll(pageable);
+    }
+
+    // ! 질문 수정 추가
+    public void modify(Question question, String subject, String content) {
+        question.setSubject(subject);
+        question.setContent(content);
+        question.setModifyDate(LocalDateTime.now());
+        this.questionRepository.save(question);
+    }
+
+    // ! 질문 삭제 추가
+    public void delete(Question question) {
+        this.questionRepository.delete(question);
     }
 }
